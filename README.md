@@ -1,1 +1,3 @@
-# praktikum_new_diplom
+# Foodgram
+### Дипломный проект курса python - разрабоки
+
