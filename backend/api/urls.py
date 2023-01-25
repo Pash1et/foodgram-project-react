@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework import routers
-from .views import (ShoppingCartListView, UserViewSet, TagViewSet,
+from .views import (ShoppingCartListView, SubscribeListViewSet, SubscribeViewSet, UserViewSet, TagViewSet,
                     IngridientViewSet, RecipeViewSet,
                     FavoriteListViewSet)
 
@@ -15,6 +15,8 @@ router.register('recipes', RecipeViewSet, basename='recipes')
 
 
 urlpatterns = [
+    path('users/subscriptions/', SubscribeListViewSet.as_view({'get': 'list'})),
+    path('users/<int:pk>/subscribe/', SubscribeViewSet.as_view()),
     path('', include('djoser.urls')),
     path('auth/', include('djoser.urls.authtoken')),
     path('recipes/<int:pk>/favorite/', FavoriteListViewSet.as_view()),

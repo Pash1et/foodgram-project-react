@@ -54,7 +54,6 @@ class Recipe(models.Model):
     tag = models.ManyToManyField(
         Tag,
         through='TagRecipe',
-        blank=True,
         verbose_name='Тег',
     )
     cooking_time = models.PositiveIntegerField(
