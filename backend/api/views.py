@@ -1,20 +1,23 @@
+from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+
+from rest_framework import status, views, viewsets
 from rest_framework.decorators import action
-from django.db.models import Sum
-from .serializers import (FavoriteCreateSerializer, FavoriteSerializer,
-                          RecipeSerializer, ShoppingCartCreateSerializer,
-                          ShoppingCartSerializer, SubscribeCreateSerializer,
-                          UserSerializer, IngredientSerializer,
-                          TagSerializer, RecipeListSerializer,
-                          SubscribeListSerializer)
-from rest_framework import viewsets, views, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from users.models import User, Follow
-from recipes.models import (Recipe, Ingredient, Tag, Favorite,
-                            ShoppingCart, IngredientAmount)
+
+from recipes.models import (Favorite, Ingredient, IngredientAmount, Recipe,
+                            ShoppingCart, Tag)
+from users.models import Follow, User
+
 from .permissions import IsAuthorOrAdmin
+from .serializers import (FavoriteCreateSerializer, FavoriteSerializer,
+                          IngredientSerializer, RecipeListSerializer,
+                          RecipeSerializer, ShoppingCartCreateSerializer,
+                          ShoppingCartSerializer, SubscribeCreateSerializer,
+                          SubscribeListSerializer, TagSerializer,
+                          UserSerializer)
 
 
 class UserViewSet(viewsets.ModelViewSet):
