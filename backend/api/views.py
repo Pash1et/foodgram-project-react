@@ -88,7 +88,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             amount = IngredientAmount.objects.filter(
                 ingredient=ingredient,
                 recipe__in=shoppingcart
-            ).aggregate(total_amount=Sum('amount'))
+            ).values_list('amount').aggregate(total_amount=Sum('amount'))
             shopping_list.append(f'{ingredient.name} - '
                                  f'{amount["total_amount"]} '
                                  f'{ingredient.measurement_unit} \n')
@@ -96,7 +96,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                                 content_type="text/plain,charset=utf8")
         return response
 
-    def create(self, request, *args, **kwargs):
+    def create(self, request):
         request = request.data.copy()
         request['tags'] = [{"id": id} for id in request['tags']]
         serializer = RecipeSerializer(data=request)
@@ -104,7 +104,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    def update(self, request, *args, **kwargs):
+    def update(self, request, **kwargs):
         pk = kwargs.get('pk')
         instance = get_object_or_404(Recipe, pk=pk)
         request = request.data.copy()

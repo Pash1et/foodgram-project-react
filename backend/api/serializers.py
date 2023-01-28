@@ -72,41 +72,78 @@ class RecipeSerializer(serializers.ModelSerializer):
         )
         model = Recipe
 
-    def validate_tags(self, tags):
-        tags = self.initial_data.get('tags')
+    def validate_tags(self, data):
+        tags = data
         if not tags:
             raise serializers.ValidationError('Нужно выбрать минимум 1 тег')
-        return tags
+        tags_list = []
+        for cur_tag in tags:
+            tag = get_object_or_404(Tag, id=cur_tag['tag']['id'])
+            if tag in tags_list:
+                raise serializers.ValidationError(
+                    'Тег должен быть уникальным'
+                )
+            tags_list.append(cur_tag['tag'])
+        return tags_list
 
-    def validate_cooking_time(self, cooking_time):
-        if cooking_time < 1:
+    def validate_cooking_time(self, data):
+        cocking_time = data
+        if cocking_time < 1:
             raise serializers.ValidationError(
                 'Время готовки не может быть < 1 мин')
-        return cooking_time
+        return cocking_time
 
-    def validate_ingredients(self, ingredients):
-        ingredients = self.initial_data.get('ingredients')
+    def validate_ingredients(self, data):
+        ingredients = data
         if not ingredients:
             raise serializers.ValidationError(
                 'Нужно выбрать минимум 1 ингридиент'
             )
-        return ingredients
+        ingredients_list = []
+        for cur_ingr in ingredients:
+            ingredient = get_object_or_404(
+                Ingredient, id=cur_ingr['ingredient']['id']
+            )
+            if ingredient in ingredients_list:
+                raise serializers.ValidationError(
+                    'Ингредиенты должны быть уникальны'
+                )
+            if int(cur_ingr['amount'] <= 0):
+                raise serializers.ValidationError(
+                    'Количество ингредиента должно быть > 0'
+                )
+            ingredients_list.append(cur_ingr)
+        return ingredients_list
+
+    @staticmethod
+    def create_tag_and_ingradient(tags, ingredients, recipe):
+        tags_list = []
+        for tag in tags:
+            cur_tag = get_object_or_404(Tag, id=tag['id'])
+            tags_list.append(
+                TagRecipe(recipe=recipe, tag=cur_tag)
+            )
+
+        ingredient_list = []
+        for ingredient in ingredients:
+            cur_ingr = get_object_or_404(
+                Ingredient, id=ingredient['ingredient']['id']
+            )
+            amount = ingredient['amount']
+            ingredient_list.append(
+                IngredientAmount(recipe=recipe,
+                                 ingredient=cur_ingr,
+                                 amount=amount)
+            )
+        TagRecipe.objects.bulk_create(tags_list)
+        IngredientAmount.objects.bulk_create(ingredient_list)
 
     def create(self, validated_data):
+        print(validated_data)
         ingredients = validated_data.pop('ingredientamount_set')
         tags = validated_data.pop('tagrecipe_set')
         recipe = Recipe.objects.create(**validated_data)
-
-        for tag in tags:
-            cur_tag = get_object_or_404(Tag, id=tag.get('id'))
-            TagRecipe.objects.create(recipe=recipe, tag=cur_tag)
-
-        for ingredient in ingredients:
-            cur_ingr = get_object_or_404(Ingredient, id=ingredient.get('id'))
-            amount = ingredient.get('amount')
-            IngredientAmount.objects.create(
-                recipe=recipe, ingredient=cur_ingr, amount=amount
-            )
+        self.create_tag_and_ingradient(tags, ingredients, recipe)
         return recipe
 
     def update(self, instance, validated_data):
@@ -117,17 +154,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         recipe.tag.remove()
         IngredientAmount.objects.filter(recipe=instance.pk).delete()
         TagRecipe.objects.filter(recipe=instance.pk).delete()
-
-        for tag in tags:
-            cur_tag = get_object_or_404(Tag, id=tag.get('id'))
-            TagRecipe.objects.create(recipe=recipe, tag=cur_tag)
-
-        for ingredient in ingredients:
-            cur_ingr = get_object_or_404(Ingredient, id=ingredient.get('id'))
-            amount = ingredient.get('amount')
-            IngredientAmount.objects.create(
-                recipe=recipe, ingredient=cur_ingr, amount=amount
-            )
+        self.create_tag_and_ingradient(tags, ingredients, recipe)
         return recipe
 
 
