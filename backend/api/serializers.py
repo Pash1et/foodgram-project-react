@@ -56,12 +56,12 @@ class RecipeSerializer(serializers.ModelSerializer):
     tags = TagRecipeSerializer(
         source='tagrecipe_set',
         many=True,
-        )
+    )
     author = UserSerializer(read_only=True)
     ingredients = IngredientAmountSerializer(
         source='ingredientamount_set',
         many=True,
-        )
+    )
     image = Base64ImageField()
     cooking_time = serializers.IntegerField()
 
@@ -162,12 +162,12 @@ class RecipeListSerializer(serializers.ModelSerializer):
     tags = TagRecipeSerializer(
         source='tagrecipe_set',
         many=True,
-        )
+    )
     author = UserSerializer(read_only=True)
     ingredients = IngredientAmountSerializer(
         source='ingredientamount_set',
         many=True,
-        )
+    )
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
 
@@ -189,7 +189,7 @@ class RecipeListSerializer(serializers.ModelSerializer):
         recipe = obj.id
         return ShoppingCart.objects.filter(
             user=user, recipe=recipe
-            ).exists()
+        ).exists()
 
 
 class SubscribeCreateSerializer(serializers.ModelSerializer):
