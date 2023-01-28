@@ -9,7 +9,7 @@ services:
       - /.env
 
   backend:
-    image: dmitrygorelov/backend:latest
+    image: dmitrygorelov/foodgram:latest
     restart: always
     volumes:
       - static_value:/backend/static/
