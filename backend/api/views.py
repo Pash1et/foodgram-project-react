@@ -2,7 +2,7 @@ from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 
-from rest_framework import status, views, viewsets
+from rest_framework import status, views, viewsets, mixins
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -23,6 +23,7 @@ from .serializers import (FavoriteCreateSerializer, FavoriteSerializer,
 class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.all()
+    permission_classes = (IsAuthenticated,)
 
 
 class IngridientViewSet(viewsets.ModelViewSet):
