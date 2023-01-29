@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 
 from rest_framework import status, views, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
 from recipes.models import (Favorite, Ingredient, IngredientAmount, Recipe,
@@ -23,7 +23,7 @@ from .serializers import (FavoriteCreateSerializer, FavoriteSerializer,
 class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.all()
-    permission_classes = (IsAuthorOrAdmin,)
+    permission_classes = (IsAuthenticatedOrReadOnly,)
 
 
 class IngridientViewSet(viewsets.ModelViewSet):
