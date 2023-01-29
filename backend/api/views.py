@@ -51,10 +51,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         queryset = Recipe.objects.all()
         user = self.request.user
 
-        #if self.request.query_params.get('tags') is not None:
-        #    slug = self.request.query_params.getlist('tags')
-        #    queryset = queryset.filter(tag__slug__in=slug)
-
         if self.request.query_params.get('is_favorited') is not None:
             recipe = Favorite.objects.filter(user=user).values(
                 'favorite_recipe'
