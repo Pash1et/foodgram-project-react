@@ -34,6 +34,7 @@ class TagRecipeSerializer(serializers.ModelSerializer):
 
 
 class IngredientSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Ingredient
         fields = ('id', 'name', 'measurement_unit')
@@ -116,7 +117,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         return ingredients_list
 
     @staticmethod
-    def create_tag_and_ingradient(tags, ingredients, recipe):
+    def create_tag_and_ingredient(tags, ingredients, recipe):
         tags_list = []
         for tag in tags:
             cur_tag = get_object_or_404(Tag, id=tag['id'])
@@ -154,7 +155,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         recipe.tag.remove()
         IngredientAmount.objects.filter(recipe=instance.pk).delete()
         TagRecipe.objects.filter(recipe=instance.pk).delete()
-        self.create_tag_and_ingradient(tags, ingredients, recipe)
+        self.create_tag_and_ingredient(tags, ingredients, recipe)
         return recipe
 
 
