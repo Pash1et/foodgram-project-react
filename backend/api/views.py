@@ -23,7 +23,6 @@ from .serializers import (FavoriteCreateSerializer, FavoriteSerializer,
 class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.all()
-    permission_classes = (IsAuthenticatedOrReadOnly,)
 
 
 class IngridientViewSet(viewsets.ModelViewSet):
