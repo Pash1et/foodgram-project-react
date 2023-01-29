@@ -46,7 +46,7 @@ class TagViewSet(viewsets.ModelViewSet):
 
 class RecipeViewSet(viewsets.ModelViewSet):
     serializer_class = RecipeListSerializer
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthorOrAdmin,)
 
     def get_queryset(self):
         queryset = Recipe.objects.all()
