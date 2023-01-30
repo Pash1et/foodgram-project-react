@@ -6,6 +6,8 @@ from rest_framework import status, views, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from django_filters.rest_framework import DjangoFilterBackend
+from .filters import RecipeFilter
 
 from recipes.models import (Favorite, Ingredient, Recipe,
                             ShoppingCart, Tag)
@@ -45,28 +47,11 @@ class TagViewSet(viewsets.ModelViewSet):
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
+    queryset = Recipe.objects.all()
     serializer_class = RecipeListSerializer
     permission_classes = (IsAuthorOrAdmin,)
-
-    def get_queryset(self):
-        queryset = Recipe.objects.all()
-        user = self.request.user
-
-        if self.request.query_params.get('is_favorited') is not None:
-            recipe = Favorite.objects.filter(user=user).values(
-                'favorite_recipe'
-            )
-            queryset = queryset.filter(id__in=recipe)
-
-        if self.request.query_params.get('is_in_shopping_cart') is not None:
-            recipe = ShoppingCart.objects.filter(user=user).values('recipe')
-            queryset = queryset.filter(id__in=recipe)
-
-        if self.request.query_params.get('author') is not None:
-            pk = self.request.query_params.get('author')
-            queryset = queryset.filter(author=pk)
-
-        return queryset
+    filter_backends = (DjangoFilterBackend,)
+    filter_class = (RecipeFilter,)
 
     @action(detail=False,
             permission_classes=(IsAuthenticated,),
