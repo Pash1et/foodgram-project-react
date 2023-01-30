@@ -74,17 +74,17 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def download_shopping_cart(self, request):
         shopping_list = []
         user = request.user
-        ingredient_name = 'recipe__ingredientamount__ingredient__name'
-        ingredient_unit = 'recipe__ingredientamount__ingredient__measurement_unit'
-        ingredient_amount = 'recipe__ingredientamount__amount'
+        name = 'recipe__ingredientamount__ingredient__name'
+        unit = 'recipe__ingredientamount__ingredient__measurement_unit'
+        amount = 'recipe__ingredientamount__amount'
         ingredients = user.shoppingcart.select_related('recipe').values(
-            ingredient_name, ingredient_unit
-        ).annotate(Sum(ingredient_amount))
+            name, unit
+        ).annotate(Sum(amount))
         for ingredient in ingredients:
             shopping_list += (
-                f'{ingredient["recipe__ingredientamount__ingredient__name"]} - '
+                f'{ingredient[name]} - '
                 f'{ingredient["recipe__ingredientamount__amount__sum"]} '
-                f'{ingredient["recipe__ingredientamount__ingredient__measurement_unit"]}'
+                f'{ingredient[unit]}'
                 f'\n'
             )
         response = HttpResponse(shopping_list,
