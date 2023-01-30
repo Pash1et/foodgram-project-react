@@ -7,7 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from recipes.models import (Favorite, Ingredient, IngredientAmount, Recipe,
+from recipes.models import (Favorite, Ingredient, Recipe,
                             ShoppingCart, Tag)
 from users.models import Follow, User
 
@@ -74,21 +74,17 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def download_shopping_cart(self, request):
         shopping_list = []
         user = request.user
-        shoppingcart = ShoppingCart.objects.filter(user=user).values(
-            'recipe'
-        )
-        recipe = Recipe.objects.filter(id__in=shoppingcart).values(
-            'ingredients'
-        )
-        ingredients = Ingredient.objects.filter(id__in=recipe)
+        ingredients = user.shoppingcart.select_related('recipe').values(
+            'recipe__recipe__ingredient__name',
+            'recipe__recipe__ingredient__measurement_unit'
+        ).annotate(Sum('recipe__recipe__amount'))
         for ingredient in ingredients:
-            amount = IngredientAmount.objects.filter(
-                ingredient=ingredient,
-                recipe__in=shoppingcart
-            ).values_list('amount').aggregate(total_amount=Sum('amount'))
-            shopping_list.append(f'{ingredient.name} - '
-                                 f'{amount["total_amount"]} '
-                                 f'{ingredient.measurement_unit} \n')
+            shopping_list += (
+                f'{ingredient["recipe__recipe__ingredient__name"]} - '
+                f'{ingredient["recipe__recipe__amount__sum"]} '
+                f'{ingredient["recipe__recipe__ingredient__measurement_unit"]}'
+                f'\n'
+            )
         response = HttpResponse(shopping_list,
                                 content_type="text/plain,charset=utf8")
         return response
