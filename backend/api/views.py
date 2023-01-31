@@ -6,6 +6,8 @@ from rest_framework import status, views, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from api.methods import custom_post
+from api.methods import custom_delete
 
 
 from recipes.models import (Favorite, Ingredient, Recipe,
@@ -49,6 +51,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeListSerializer
     permission_classes = (IsAuthorOrAdmin,)
+
+    def get_serializer_class(self):
+        if self.action in ('create', 'update'):
+            return RecipeSerializer
+        return RecipeListSerializer
 
     def get_queryset(self):
         queryset = Recipe.objects.all()
@@ -96,24 +103,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         response = HttpResponse(shopping_list,
                                 content_type="text/plain,charset=utf8")
         return response
-
-    def create(self, request):
-        request = request.data.copy()
-        request['tags'] = [{"id": id} for id in request['tags']]
-        serializer = RecipeSerializer(data=request)
-        serializer.is_valid(raise_exception=True)
-        serializer.save(author=self.request.user)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    def update(self, request, **kwargs):
-        pk = kwargs.get('pk')
-        instance = get_object_or_404(Recipe, pk=pk)
-        request = request.data.copy()
-        request['tags'] = [{"id": id} for id in request['tags']]
-        serializer = RecipeSerializer(instance, data=request, partial=True)
-        serializer.is_valid(raise_exception=True)
-        serializer.save(author=self.request.user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class SubscribeViewSet(views.APIView):
@@ -166,29 +155,10 @@ class FavoriteListViewSet(views.APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, pk):
-        recipe = get_object_or_404(Recipe, pk=pk)
-        user = self.request.user
-        serializer = FavoriteCreateSerializer(
-            data={
-                'recipe_id': pk, 'user_id': user.id
-            }
-        )
-        serializer.is_valid(raise_exception=True)
-        serializer.save(user=user)
-        favorite = get_object_or_404(
-            Favorite, user=user, favorite_recipe=recipe
-        )
-        serializer = FavoriteSerializer(favorite)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return custom_post(self, request, pk, FavoriteCreateSerializer)
 
     def delete(self, request, pk):
-        recipe = get_object_or_404(Recipe, pk=pk)
-        user = self.request.user
-        favorite = get_object_or_404(
-            Favorite, user=user, favorite_recipe=recipe
-        )
-        favorite.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return custom_delete(self, request, pk, Favorite)
 
 
 class ShoppingCartListView(views.APIView):
@@ -197,26 +167,7 @@ class ShoppingCartListView(views.APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, pk):
-        recipe = get_object_or_404(Recipe, pk=pk)
-        user = self.request.user
-        serializer = ShoppingCartCreateSerializer(
-            data={
-                'recipe_id': pk, 'user_id': user.id
-            }
-        )
-        serializer.is_valid(raise_exception=True)
-        serializer.save(user=user)
-        shoppingcart = get_object_or_404(
-            ShoppingCart, user=user, recipe=recipe
-        )
-        serializer = ShoppingCartSerializer(shoppingcart)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return custom_post(self, request, pk, ShoppingCartCreateSerializer)
 
     def delete(self, request, pk):
-        recipe = get_object_or_404(Recipe, pk=pk)
-        user = self.request.user
-        shoppingcart = get_object_or_404(
-            ShoppingCart, user=user, recipe=recipe
-        )
-        shoppingcart.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return custom_delete(self, request, pk, ShoppingCart)

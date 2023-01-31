@@ -133,7 +133,7 @@ class Favorite(models.Model):
         verbose_name='Пользователь',
         related_name='favorite',
     )
-    favorite_recipe = models.ForeignKey(
+    recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
         verbose_name='Рецепт в избранном',
@@ -144,7 +144,7 @@ class Favorite(models.Model):
         verbose_name_plural = 'Избранные'
         constraints = (
             models.UniqueConstraint(
-                fields=('user', 'favorite_recipe'),
+                fields=('user', 'recipe'),
                 name='unique_fav_recipe',
             ),
         )
