@@ -10,3 +10,10 @@
 [![docker](https://img.shields.io/badge/-Docker-464646?style=flat-square&logo=docker)](https://www.docker.com/)
 ### Дипломный проект курса python - разработки
 
+### Адрес
+http://84.201.132.92/
+
+### Доступ к админке:  
+http://84.201.132.92/admin/  
+email: `admin@admin.com`  
+password: `admin`
