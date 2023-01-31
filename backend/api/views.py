@@ -67,7 +67,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         if self.request.query_params.get('is_favorited') is not None:
             recipe = Favorite.objects.filter(user=user).values(
-                'favorite_recipe'
+                'recipe'
             )
             queryset = queryset.filter(id__in=recipe)
 
