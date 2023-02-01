@@ -5,6 +5,7 @@ from rest_framework import status, views, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from djoser.views import UserViewSet
 
 from api.methods import custom_delete, custom_post
 from recipes.models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
@@ -19,7 +20,7 @@ from .serializers import (FavoriteCreateSerializer, FavoriteSerializer,
                           UserSerializer)
 
 
-class UserViewSet(viewsets.ModelViewSet):
+class UserViewSet(UserViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.all()
     permission_classes = (IsAuthenticated,)
