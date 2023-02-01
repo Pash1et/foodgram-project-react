@@ -55,7 +55,7 @@ class IngredientAmountSerializer(serializers.ModelSerializer):
 
 
 class RecipeSerializer(serializers.ModelSerializer):
-    tag = serializers.PrimaryKeyRelatedField(
+    tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(),
         many=True
     )
@@ -69,7 +69,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = (
-            'id', 'tag', 'author', 'ingredients',
+            'id', 'tags', 'author', 'ingredients',
             'name', 'image', 'text', 'cooking_time'
         )
         model = Recipe
@@ -134,7 +134,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         author = self.context['request'].user
         ingredients = validated_data.pop('ingredientamount_set')
-        tags = validated_data.pop('tag')
+        tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(author=author, **validated_data)
         recipe.tag.set(tags)
         self.create_ingredient(ingredients, recipe)
@@ -142,7 +142,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         ingredients = validated_data.pop('ingredientamount_set')
-        tags = validated_data.pop('tag')
+        tags = validated_data.pop('tags')
         Recipe.objects.filter(id=instance.pk).update(**validated_data)
         recipe = get_object_or_404(Recipe, id=instance.pk)
         recipe.tag.remove()

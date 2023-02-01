@@ -23,7 +23,7 @@ class TagAdmin(admin.ModelAdmin):
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     list_display = ('id', 'author', 'name', 'image_tag',)
-    list_filter = ('tag',)
+    list_filter = ('tags',)
     search_fields = ('author__username', 'name',)
     inlines = (IngredientAmountInLine, TagRecipeInLine,)
 
