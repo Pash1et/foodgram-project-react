@@ -144,7 +144,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         tags = validated_data.pop('tags')
         Recipe.objects.filter(id=instance.pk).update(**validated_data)
         recipe = get_object_or_404(Recipe, id=instance.pk)
-        recipe.tag.remove()
+        recipe.tags.remove()
         IngredientAmount.objects.filter(recipe=instance.pk).delete()
         TagRecipe.objects.filter(recipe=instance.pk).delete()
         recipe.tags.set(tags)

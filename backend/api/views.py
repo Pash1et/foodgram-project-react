@@ -49,7 +49,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthorOrAdmin,)
 
     def get_serializer_class(self):
-        if self.action in ('create', 'update'):
+        if self.request.method in ('POST', 'PATCH'):
             return RecipeSerializer
         return RecipeListSerializer
 
