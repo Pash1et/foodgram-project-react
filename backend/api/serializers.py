@@ -1,5 +1,4 @@
 from django.shortcuts import get_object_or_404
-from djoser.serializers import UserSerializer
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 
@@ -8,26 +7,11 @@ from recipes.models import (Favorite, Ingredient, IngredientAmount, Recipe,
 from users.models import Follow, User
 
 
-class UserSerializer(UserSerializer):
-    """Cериализатор djoser для управления пользователем"""
-    is_subscribed = serializers.SerializerMethodField()
+class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = (
-            'email',
-            'id',
-            'username',
-            'first_name',
-            'last_name',
-            'is_subscribed',
-        )
-
-    def get_is_subscribed(self, obj):
-        user = self.context.get('request').user
-        if user.is_anonymous or obj.username == user:
-            return False
-        return Follow.objects.filter(user=user, author=obj).exists()
+        fields = ('email', 'id', 'username', 'first_name', 'last_name',)
 
 
 class TagSerializer(serializers.ModelSerializer):
