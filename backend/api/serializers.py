@@ -136,7 +136,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         ingredients = validated_data.pop('ingredientamount_set')
         tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(author=author, **validated_data)
-        recipe.tag.set(tags)
+        recipe.tags.set(tags)
         self.create_ingredient(ingredients, recipe)
         return recipe
 
@@ -148,7 +148,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         recipe.tag.remove()
         IngredientAmount.objects.filter(recipe=instance.pk).delete()
         TagRecipe.objects.filter(recipe=instance.pk).delete()
-        recipe.tag.set(tags)
+        recipe.tags.set(tags)
         self.create_ingredient(ingredients, recipe)
         return recipe
 
