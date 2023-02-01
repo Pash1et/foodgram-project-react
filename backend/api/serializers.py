@@ -24,7 +24,6 @@ class UserSerializer(UserSerializer):
         )
 
     def get_is_subscribed(self, obj):
-        """ Определение подписки пользователя на автора """
         user = self.context.get('request').user
         if user.is_anonymous or obj.username == user:
             return False
