@@ -96,7 +96,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         ingredients = data
         if not ingredients:
             raise serializers.ValidationError(
-                'Нужно выбрать минимум 1 ингридиент'
+                'Нужно выбрать минимум 1 ингредиент'
             )
         ingredients_list = []
         for cur_ingr in ingredients:
@@ -111,7 +111,7 @@ class RecipeSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     'Количество ингредиента должно быть > 0'
                 )
-            ingredients_list.append(cur_ingr)
+            ingredients_list.append(ingredient)
         return ingredients_list
 
     @staticmethod
