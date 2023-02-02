@@ -6,7 +6,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from api.methods import custom_delete, custom_post
+from .methods import custom_delete, custom_post
 from recipes.models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
 from users.models import Follow, User
 from .permissions import IsAuthorOrAdmin
@@ -58,7 +58,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         if self.request.query_params.get('tags') is not None:
             slug = self.request.query_params.getlist('tags')
-            queryset = queryset.filter(tags__slug__in=slug)
+            queryset = queryset.filter(tags__slug__in=slug).distinct()
 
         if self.request.query_params.get('is_favorited') is not None:
             recipe = Favorite.objects.filter(user=user).values(
