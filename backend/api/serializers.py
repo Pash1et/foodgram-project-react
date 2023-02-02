@@ -8,10 +8,16 @@ from users.models import Follow, User
 
 
 class UserSerializer(serializers.ModelSerializer):
+    is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ('email', 'id', 'username', 'first_name', 'last_name',)
+        fields = ('email', 'id', 'username',
+                  'first_name', 'last_name', 'is_subscribed')
+
+    def get_is_subscribed(self, obj):
+        user = self.context.get('request').user
+        return Follow.objects.filter(user=user, author=obj).exists()
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -235,7 +241,7 @@ class SubscribeListSerializer(serializers.ModelSerializer):
     def get_recipes(self, obj):
         author = obj.author
         recipe = Recipe.objects.filter(author=author)
-        return RecipeSerializer(recipe, many=True).data
+        return RecipeInFollowSerializer(recipe, many=True).data
 
     def get_recipes_count(self, obj):
         author = obj.author
@@ -322,3 +328,10 @@ class ShoppingCartCreateSerializer(serializers.ModelSerializer):
                 'Уже в корзине'
             )
         return super().validate(attrs)
+
+
+class RecipeInFollowSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Recipe
+        fields = ('id', 'name', 'image', 'cooking_time',)

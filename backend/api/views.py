@@ -14,14 +14,7 @@ from .serializers import (FavoriteCreateSerializer, FavoriteSerializer,
                           IngredientSerializer, RecipeListSerializer,
                           RecipeSerializer, ShoppingCartCreateSerializer,
                           ShoppingCartSerializer, SubscribeCreateSerializer,
-                          SubscribeListSerializer, TagSerializer,
-                          UserSerializer)
-
-
-class UserViewSet(viewsets.ModelViewSet):
-    serializer_class = UserSerializer
-    queryset = User.objects.all()
-    permission_classes = (IsAuthenticated,)
+                          SubscribeListSerializer, TagSerializer)
 
 
 class IngridientViewSet(viewsets.ModelViewSet):
@@ -111,12 +104,6 @@ class SubscribeViewSet(views.APIView):
         )
         serializer.is_valid(raise_exception=True)
         serializer.save(user=user)
-        follow = get_object_or_404(
-            Follow,
-            user=user,
-            author=author
-        )
-        serializer = SubscribeListSerializer(follow)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def delete(self, request, pk):
@@ -134,6 +121,7 @@ class SubscribeViewSet(views.APIView):
 class SubscribeListViewSet(viewsets.ModelViewSet):
     serializer_class = SubscribeListSerializer
     permission_classes = (IsAuthenticated,)
+    queryset = Follow.objects.all()
 
     def get_queryset(self):
         user = self.request.user
